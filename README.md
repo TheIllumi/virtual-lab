@@ -52,3 +52,6 @@ pip install -e .
 ## OpenAI API Key
 
 The Virtual Lab currently uses GPT-4o from OpenAI. Save your OpenAI API key as the environment variable `OPENAI_API_KEY`. For example, add `export OPENAI_API_KEY=<your_key>` to your `.bashrc` or `.bash_profile`.
+
+## TODo: Instead of OpenAI API Key use free APIs like ``glm-4-flash``.
+For instance, use this ``API_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions"``
