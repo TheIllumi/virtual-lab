@@ -7,6 +7,7 @@ from typing import Literal
 from openai import OpenAI
 from tqdm import trange, tqdm
 
+from virtual_lab import api_key as API
 from virtual_lab.agent import Agent
 from virtual_lab.constants import CONSISTENT_TEMPERATURE, PUBMED_TOOL_DESCRIPTION
 from virtual_lab.prompts import (
@@ -91,8 +92,30 @@ def run_meeting(
     # Start timing the meeting
     start_time = time.time()
 
-    # Set up client
-    client = OpenAI()
+    # --- Configuration ---
+    # You must get your API key from the provider
+    # and paste it here. The code will not work without a valid key.
+
+    client = OpenAI(
+        base_url=API.OPENROUTER_BASE_URL,
+        api_key=API.OPENROUTER_API_KEY,
+    )
+
+    completion = client.chat.completions.create(
+    extra_headers={
+        "HTTP-Referer": "<YOUR_SITE_URL>", # Optional. Site URL for rankings on openrouter.ai.
+        "X-Title": "<YOUR_SITE_NAME>", # Optional. Site title for rankings on openrouter.ai.
+    },
+    extra_body={},
+    model="openai/gpt-oss-20b:free",
+    messages=[
+            {
+            "role": "user",
+            "content": "What is the meaning of life?"
+            }
+        ]
+    )
+    print(completion.choices[0].message.content)
 
     # Set up team
     if meeting_type == "team":
@@ -100,8 +123,13 @@ def run_meeting(
     else:
         team = [team_member] + [SCIENTIFIC_CRITIC]
 
+
     # Set up tools
     assistant_params = {"tools": [PUBMED_TOOL_DESCRIPTION]} if pubmed_search else {}
+
+    print("DEBUG team contents:")
+    for agent in team:
+        print(agent, type(agent))
 
     # Set up the assistants
     agent_to_assistant = {
